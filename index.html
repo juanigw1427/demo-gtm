@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo de Medición con GTM</title>
+  <style>
+    body {
+      background-color: #fff;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #007acc;
+      color: white;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    header img {
+      height: 50px;
+    }
+
+    .contenido {
+      padding: 30px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .catalogo {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+
+    .producto {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .producto img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .producto h3 {
+      margin: 10px 0 5px;
+    }
+
+    .boton {
+      background-color: #007acc;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      margin-top: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .boton:hover {
+      background-color: #005f99;
+    }
+
+    .carrito {
+      margin-top: 30px;
+      border-top: 1px solid #ccc;
+      padding-top: 20px;
+    }
+
+    .carrito ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .carrito li {
+      padding: 5px 0;
+    }
+
+    .cookie-banner {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      right: 20px;
+      background: #333;
+      color: white;
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .cookie-banner button {
+      background: #00c851;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+  </style>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P7W65NPX');</script>
+<!-- End Google Tag Manager -->
+  <!-- <script> ... </script> -->
+</head>
+<body>
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P7W65NPX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <header>
+    <img src="https://via.placeholder.com/100x50?text=LOGO" alt="Logo">
+    <h1>Demo Interactiva con Google Tag Manager</h1>
+  </header>
+
+  <div class="contenido">
+    <p>Explora nuestros productos y prueba los eventos para GA4 & GTM</p>
+
+    <div class="catalogo" id="catalogo">
+      <!-- Productos generados dinámicamente -->
+    </div>
+
+    <div class="carrito" id="carrito-container" style="display: none;">
+      <h2>🛒 Carrito</h2>
+      <ul id="lista-carrito"></ul>
+      <p><strong>Total: $<span id="total-carrito">0.00</span></strong></p>
+      <button class="boton" id="checkout">Ir al Checkout</button>
+      <button class="boton" id="purchase">Finalizar Compra</button>
+    </div>
+  </div>
+
+  <div class="cookie-banner" id="cookie-banner">
+    <span>Usamos cookies para mejorar la experiencia del usuario.</span>
+    <button onclick="aceptarCookies()">Aceptar</button>
+  </div>
+
+  <script>
+    const dataLayer = window.dataLayer || [];
+    const productos = [
+      { id: "P001", nombre: "Zapatillas Urbanas", precio: 89, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQpdbZs_rU1bTvpbthO73j0_gbiaZCBxg8wvA&s" },
+      { id: "P002", nombre: "Mochila Deportiva", precio: 45, img: "data:image/jpeg;base64,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" },
+      { id: "P003", nombre: "Auriculares Bluetooth", precio: 59, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTBb5MoDF5iK1EJ3sBpBW6uGjDFSe7WMgSyxg&s" },
+      { id: "P004", nombre: "Botella Térmica", precio: 19, img: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTdg4YKUuG5mBMIAoNF20Tbm0FDXT3_fuy7Nw&s" }
+    ];
+
+    let carrito = [];
+
+    const catalogo = document.getElementById('catalogo');
+    const listaCarrito = document.getElementById('lista-carrito');
+    const totalCarrito = document.getElementById('total-carrito');
+    const carritoContainer = document.getElementById('carrito-container');
+
+    productos.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'producto';
+      div.innerHTML = `
+        <img src="${p.img}" alt="${p.nombre}">
+        <h3>${p.nombre}</h3>
+        <p>Precio: $${p.precio.toFixed(2)}</p>
+        <button class="boton" onclick='agregarAlCarrito(${JSON.stringify(p)})'>Agregar al carrito</button>
+      `;
+      catalogo.appendChild(div);
+    });
+
+    function agregarAlCarrito(producto) {
+      carrito.push(producto);
+      actualizarCarrito();
+      dataLayer.push({
+        event: 'add_to_cart',
+        ecommerce: {
+          items: [{
+            item_name: producto.nombre,
+            item_id: producto.id,
+            price: producto.precio,
+            quantity: 1
+          }]
+        }
+      });
+    }
+
+    function actualizarCarrito() {
+      listaCarrito.innerHTML = '';
+      let total = 0;
+      carrito.forEach((item, i) => {
+        total += item.precio;
+        const li = document.createElement('li');
+        li.textContent = `1x ${item.nombre} - $${item.precio.toFixed(2)}`;
+        listaCarrito.appendChild(li);
+      });
+      totalCarrito.textContent = total.toFixed(2);
+      carritoContainer.style.display = 'block';
+    }
+
+    document.getElementById('checkout').addEventListener('click', () => {
+      dataLayer.push({
+        event: 'begin_checkout',
+        ecommerce: {
+          value: carrito.reduce((acc, p) => acc + p.precio, 0),
+          items: carrito.map(p => ({
+            item_name: p.nombre,
+            item_id: p.id,
+            price: p.precio,
+            quantity: 1
+          }))
+        }
+      });
+      alert('Simulando paso a Checkout...');
+    });
+
+    document.getElementById('purchase').addEventListener('click', () => {
+      const transactionId = 'TXN' + Math.floor(Math.random() * 100000);
+      dataLayer.push({
+        event: 'purchase',
+        ecommerce: {
+          transaction_id: transactionId,
+          value: carrito.reduce((acc, p) => acc + p.precio, 0),
+          currency: 'USD',
+          items: carrito.map(p => ({
+            item_name: p.nombre,
+            item_id: p.id,
+            price: p.precio,
+            quantity: 1
+          }))
+        }
+      });
+      alert('¡Gracias por tu compra! Transacción: ' + transactionId);
+      carrito = [];
+      actualizarCarrito();
+      carritoContainer.style.display = 'none';
+    });
+
+    function aceptarCookies() {
+      document.getElementById('cookie-banner').style.display = 'none';
+      dataLayer.push({ event: 'cookies_aceptadas' });
+    }
+  </script>
+</body>
+</html>
