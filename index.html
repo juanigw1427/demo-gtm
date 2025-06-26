@@ -1,0 +1,39 @@
+<!--test-->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Demo GTM</title>
+  <!-- GTM Head -->
+  <!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P7W65NPX');</script>
+<!-- End Google Tag Manager -->
+</head>
+<body>
+  <!-- GTM Body -->
+  <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-P7W65NPX"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+  <h1>Demo Google Tag Manager</h1>
+  <button id="boton-compra">Hacer Compra</button>
+  <a href="https://www.google.com" id="link-externo" target="_blank">Ir a Google</a>
+
+  <script>
+    // Evento personalizado para GTM
+    document.getElementById('boton-compra').addEventListener('click', function () {
+      dataLayer.push({
+        event: 'compra_realizada',
+        categoria: 'boton',
+        accion: 'click',
+        etiqueta: 'Hacer Compra'
+      });
+    });
+  </script>
+</body>
+</html>
